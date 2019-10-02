@@ -13,12 +13,13 @@ class Decrypter:
 
     def decrypt(self, text):
         self.__read_cert()
-        print("Decrypting text! " + self.__cert_contents)
+        return self.__cert_contents
         
 
 def main():
     decrypter = Decrypter("lib/key.pem")
-    decrypter.decrypt("test")
+    out = decrypter.decrypt("test")
+    print(out)
 
 
 if __name__ == "__main__":
