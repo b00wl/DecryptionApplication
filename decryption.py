@@ -1,29 +1,38 @@
 from huffman import HuffmanCoding
 import argparse
+from decryption_impl import *
 
 
 class Decrypter:
     __decryption_algorithm = ""
 
-    def __init__(self, key_file, code_book, file):
+    def __init__(self, logs, key_file, code_book):
         self.key_file = key_file
         self.code_book = code_book
-        self.file = file
+        self.logs = logs
 
     @staticmethod
-    def __read_file(file) -> str:
-        with open(file) as f:
+    def __read_file(logs) -> str:
+        with open(logs) as f:
             __contents = f.read()
         return __contents
 
     def decrypt(self):
+        logs = self.__read_file(self.logs)
         key = self.__read_file(self.key_file)
+        test = bytes(key, 'utf-8')
+        print(test)
+        print(len(test))
+        print(type(test))
         code_book = self.__read_file(self.code_book)
-        file = self.__read_file(self.file)
 
-        huffman_coding = HuffmanCoding("lib/sample.txt")
-        output_path = huffman_coding.compress()
-        huffman_coding.decompress(output_path)
+        text = parse_logs_for_static(logs)
+        decrypt_static_logs(text, key, code_book)
+
+
+        #huffman_coding = HuffmanCoding("lib/sample.txt")
+        #output_path = huffman_coding.compress()
+        #huffman_coding.decompress(output_path)
 
 
 def parse_args():
@@ -31,14 +40,13 @@ def parse_args():
     Returns:
         list: The 2 argument files in args.fileA and args.fileB
     """
-    parser = argparse.ArgumentParser(description='Determine if file is malicious')
-    parser.add_argument('--key', default='',
+    parser = argparse.ArgumentParser(description='Decrypt Log File')
+    parser.add_argument('--logs', default='encrypted_logs.txt',
                         help="Pass key file name within directory path")
-    parser.add_argument('--codebook', default='',
+    parser.add_argument('--key', default='key.txt',
+                        help="Pass key file name within directory path")
+    parser.add_argument('--codebook', default='codebook.txt',
                         help="Pass codebook file name within directory path")
-
-    parser.add_argument('--file', default='',
-                        help="Pass file name within directory path")
 
     args = parser.parse_args()
     return args
@@ -46,7 +54,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    decrypter = Decrypter(args.key, args.codebook, args.file)
+    decrypter = Decrypter(args.logs, args.key, args.codebook)
     decrypter.decrypt()
     # print(out)
 
