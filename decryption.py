@@ -21,9 +21,6 @@ class Decrypter:
         logs = self.__read_file(self.logs)
         key = self.__read_file(self.key_file)
         test = bytes(key, 'utf-8')
-        print(test)
-        print(len(test))
-        print(type(test))
         code_book = self.__read_file(self.code_book)
 
         text = parse_logs_for_static(logs)
