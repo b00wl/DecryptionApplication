@@ -13,27 +13,69 @@ def parse_logs_for_static(logs):
     return results
 
 
-def decrypt_static_logs(text, key, code_book):
+def parse_logs_for_dynamic(logs):
+    lines = logs.splitlines()
+    results = {}
+    line_num = 0
+    for line in lines:
+        if "||" in line:
+            text = line[line.rfind('||')+2:]
+            if text != "":
+                results[text]=line_num
+        line_num += 1
+    return results
+
+
+def parse_results_for_padding(text):
+    return str(text).split('b\'')[1].split('\\x')[0]
+
+
+def decrypt_static_logs(text, key, code_book, iv):
     key = base64.decodebytes(bytes(key,'utf-8'))
-    for line in text:
-        decoded_line = base64.decodebytes(bytes(line, 'utf-8'))
-        #padded_line = pad(decoded_line)
-        aes = AES.new(key, AES.MODE_CBC, 's needs to be 16')
+    iv = base64.decodebytes(bytes(iv, 'utf-8'))
+    for encrypted in text:
+        decoded_line = base64.decodebytes(bytes(encrypted, 'utf-8'))
+        aes = AES.new(key, AES.MODE_CBC, iv)
 
+        decrypted = parse_results_for_padding(aes.decrypt(decoded_line))
+        write_static_logs(code_book, decrypted)
+
+
+def decrypt_dynamic_logs(text, key, iv):
+    key = base64.decodebytes(bytes(key,'utf-8'))
+    iv = base64.decodebytes(bytes(iv, 'utf-8'))
+    for encrypted, line_num in text.items():
+        decoded_line = base64.decodebytes(bytes(encrypted, 'utf-8'))
+        aes = AES.new(key, AES.MODE_CBC, iv)
         decrypted = aes.decrypt(decoded_line)
-        print(decrypted)
+
+        #decrypted = parse_results_for_padding(aes.decrypt(decoded_line))
+        write_dynamic_logs(decrypted, line_num)
 
 
+def write_static_logs(code_book, text):
+    lines = code_book.splitlines()
+    for line in lines:
+        unencrypted = line.split('-')
+        if text in unencrypted[1]:
+            write_static_logs_to_file(unencrypted[0])
 
-block_size = AES.block_size
-def pad(plain_text):
-    """
-    func to pad cleartext to be multiples of 8-byte blocks.
-    If you want to encrypt a text message that is not multiples of 8-byte blocks,
-    the text message must be padded with additional bytes to make the text message to be multiples of 8-byte blocks.
-    """
-    number_of_bytes_to_pad = block_size - len(plain_text) % block_size
-    ascii_string = chr(number_of_bytes_to_pad)
-    padding_str = number_of_bytes_to_pad * ascii_string
-    padded_plain_text =  plain_text + padding_str
-    return padded_plain_text
+
+def write_static_logs_to_file(text):
+    with open('unecrypted_logs.txt', 'a') as unencrypted_logs:
+        unencrypted_logs.write(text + '\n')
+
+
+def write_dynamic_logs(text, line_num):
+    with open('unecrypted_logs.txt', 'r') as unencrypted_logs:
+        data = unencrypted_logs.readlines()
+
+    print(data)
+
+
+    # now change the 2nd line, note that you have to add a newline
+    data[line_num] = data[line_num].strip() + str(text) + '\n'
+
+    # and write everything back
+    with open('unecrypted_logs.txt', 'w') as unencrypted_logs:
+        unencrypted_logs.writelines(data)

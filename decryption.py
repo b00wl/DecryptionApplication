@@ -19,15 +19,18 @@ class Decrypter:
 
     def decrypt(self):
         logs = self.__read_file(self.logs)
-        key = self.__read_file(self.key_file)
-        test = bytes(key, 'utf-8')
-        print(test)
-        print(len(test))
-        print(type(test))
-        code_book = self.__read_file(self.code_book)
+        keys = self.__read_file(self.key_file)
+        key = keys.splitlines()[0]
+        iv = keys.splitlines()[1]
 
-        text = parse_logs_for_static(logs)
-        decrypt_static_logs(text, key, code_book)
+        # Static Decryption
+        code_book = self.__read_file(self.code_book)
+        static_text = parse_logs_for_static(logs)
+        decrypt_static_logs(static_text, key, code_book, iv)
+
+        # Dynamic Decryption
+        dynamic_text = parse_logs_for_dynamic(logs)
+        decrypt_dynamic_logs(dynamic_text, key, iv)
 
 
         #huffman_coding = HuffmanCoding("lib/sample.txt")
