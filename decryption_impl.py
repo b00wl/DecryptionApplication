@@ -47,10 +47,9 @@ def decrypt_dynamic_logs(text, key, iv):
     for encrypted, line_num in text.items():
         decoded_line = base64.decodebytes(bytes(encrypted, 'utf-8'))
         aes = AES.new(key, AES.MODE_CBC, iv)
-        decrypted = aes.decrypt(decoded_line)
 
-        #decrypted = parse_results_for_padding(aes.decrypt(decoded_line))
-        write_dynamic_logs(decrypted, line_num)
+        decrypted = parse_results_for_padding(aes.decrypt(decoded_line))
+        write_dynamic_logs_to_file(decrypted, line_num)
 
 
 def write_static_logs(code_book, text):
@@ -66,12 +65,12 @@ def write_static_logs_to_file(text):
         unencrypted_logs.write(text + '\n')
 
 
-def write_dynamic_logs(text, line_num):
+def write_dynamic_logs_to_file(text, line_num):
     with open('unecrypted_logs.txt', 'r') as unencrypted_logs:
         data = unencrypted_logs.readlines()
 
     # now change the 2nd line, note that you have to add a newline
-    data[line_num] = data[line_num].strip() + str(text) + '\n'
+    data[line_num] = data[line_num].strip() + ' ' + str(text) + '\n'
 
     # and write everything back
     with open('unecrypted_logs.txt', 'w') as unencrypted_logs:

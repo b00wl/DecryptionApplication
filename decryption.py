@@ -1,6 +1,7 @@
 from huffman import HuffmanCoding
 import argparse
 from decryption_impl import *
+import os
 
 
 class Decrypter:
@@ -56,11 +57,20 @@ def parse_args():
     return args
 
 
+def remove_unencrypted_log_file():
+    try:
+        os.remove('unecrypted_logs.txt')
+        with open('unecrypted_logs.txt'):
+            pass
+    except OSError:
+        pass
+
+
 def main():
     args = parse_args()
+    remove_unencrypted_log_file()
     decrypter = Decrypter(args.logs, args.key, args.codebook)
     decrypter.decrypt()
-    # print(out)
 
 
 if __name__ == "__main__":
