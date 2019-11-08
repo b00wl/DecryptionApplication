@@ -24,6 +24,7 @@ class Decrypter:
         iv = keys.splitlines()[1]
 
         # Static Decryption
+        key = self.__read_file(self.key_file)
         code_book = self.__read_file(self.code_book)
         static_text = parse_logs_for_static(logs)
         decrypt_static_logs(static_text, key, code_book, iv)

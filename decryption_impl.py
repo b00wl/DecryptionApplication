@@ -70,9 +70,6 @@ def write_dynamic_logs(text, line_num):
     with open('unecrypted_logs.txt', 'r') as unencrypted_logs:
         data = unencrypted_logs.readlines()
 
-    print(data)
-
-
     # now change the 2nd line, note that you have to add a newline
     data[line_num] = data[line_num].strip() + str(text) + '\n'
 
