@@ -5,7 +5,6 @@ import os
 
 
 class Decrypter:
-    __decryption_algorithm = ""
 
     def __init__(self, logs, key_file, code_book):
         self.key_file = key_file
@@ -13,20 +12,20 @@ class Decrypter:
         self.logs = logs
 
     @staticmethod
-    def __read_file(logs) -> str:
+    def read_file(logs) -> str:
         with open(logs) as f:
             __contents = f.read()
         return __contents
 
     def decrypt(self):
-        logs = self.__read_file(self.logs)
-        keys = self.__read_file(self.key_file)
+        logs = self.read_file(self.logs)
+        keys = self.read_file(self.key_file)
         key = keys.splitlines()[0]
         iv = keys.splitlines()[1]
 
         # Static Decryption
-        key = self.__read_file(self.key_file)
-        code_book = self.__read_file(self.code_book)
+        key = self.read_file(self.key_file)
+        code_book = self.read_file(self.code_book)
         static_text = parse_logs_for_static(logs)
         decrypt_static_logs(static_text, key, code_book, iv)
 

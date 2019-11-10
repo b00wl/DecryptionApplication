@@ -31,7 +31,7 @@ def parse_results_for_padding(text):
 
 
 def decrypt_static_logs(text, key, code_book, iv):
-    key = base64.decodebytes(bytes(key,'utf-8'))
+    key = base64.decodebytes(bytes(key, 'utf-8'))
     iv = base64.decodebytes(bytes(iv, 'utf-8'))
     for encrypted in text:
         decoded_line = base64.decodebytes(bytes(encrypted, 'utf-8'))
