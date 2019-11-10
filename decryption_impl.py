@@ -1,6 +1,6 @@
 import re
-from Crypto.Cipher import AES
 import base64
+from Crypto.Cipher import AES
 
 
 def parse_logs_for_static(logs):
@@ -21,7 +21,7 @@ def parse_logs_for_dynamic(logs):
         if "||" in line:
             text = line[line.rfind('||')+2:]
             if text != "":
-                results[text]=line_num
+                results[text] = line_num
         line_num += 1
     return results
 
@@ -30,23 +30,23 @@ def parse_results_for_padding(text):
     return str(text).split('b\'')[1].split('\\x')[0]
 
 
-def decrypt_static_logs(text, key, code_book, iv):
+def decrypt_static_logs(text, key, code_book, initialization_vector):
     key = base64.decodebytes(bytes(key, 'utf-8'))
-    iv = base64.decodebytes(bytes(iv, 'utf-8'))
+    initialization_vector = base64.decodebytes(bytes(initialization_vector, 'utf-8'))
     for encrypted in text:
         decoded_line = base64.decodebytes(bytes(encrypted, 'utf-8'))
-        aes = AES.new(key, AES.MODE_CBC, iv)
+        aes = AES.new(key, AES.MODE_CBC, initialization_vector)
 
         decrypted = parse_results_for_padding(aes.decrypt(decoded_line))
         write_static_logs(code_book, decrypted)
 
 
-def decrypt_dynamic_logs(text, key, iv):
-    key = base64.decodebytes(bytes(key,'utf-8'))
-    iv = base64.decodebytes(bytes(iv, 'utf-8'))
+def decrypt_dynamic_logs(text, key, initialization_vector):
+    key = base64.decodebytes(bytes(key, 'utf-8'))
+    initialization_vector = base64.decodebytes(bytes(initialization_vector, 'utf-8'))
     for encrypted, line_num in text.items():
         decoded_line = base64.decodebytes(bytes(encrypted, 'utf-8'))
-        aes = AES.new(key, AES.MODE_CBC, iv)
+        aes = AES.new(key, AES.MODE_CBC, initialization_vector)
 
         decrypted = parse_results_for_padding(aes.decrypt(decoded_line))
         write_dynamic_logs_to_file(decrypted, line_num)

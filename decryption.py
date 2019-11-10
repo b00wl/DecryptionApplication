@@ -1,7 +1,6 @@
-from huffman import HuffmanCoding
 import argparse
-from decryption_impl import *
 import os
+import decryption_impl
 
 
 class Decrypter:
@@ -13,30 +12,26 @@ class Decrypter:
 
     @staticmethod
     def read_file(logs) -> str:
-        with open(logs) as f:
-            __contents = f.read()
+        with open(logs) as file_contents:
+            __contents = file_contents.read()
         return __contents
 
     def decrypt(self):
         logs = self.read_file(self.logs)
         keys = self.read_file(self.key_file)
         key = keys.splitlines()[0]
-        iv = keys.splitlines()[1]
+        initialization_vector = keys.splitlines()[1]
 
         # Static Decryption
         key = self.read_file(self.key_file)
         code_book = self.read_file(self.code_book)
-        static_text = parse_logs_for_static(logs)
-        decrypt_static_logs(static_text, key, code_book, iv)
+        static_text = decryption_impl.parse_logs_for_static(logs)
+        decryption_impl.decrypt_static_logs(static_text, key, code_book, initialization_vector)
 
         # Dynamic Decryption
-        dynamic_text = parse_logs_for_dynamic(logs)
-        decrypt_dynamic_logs(dynamic_text, key, iv)
+        dynamic_text = decryption_impl.parse_logs_for_dynamic(logs)
+        decryption_impl.decrypt_dynamic_logs(dynamic_text, key, initialization_vector)
 
-
-        #huffman_coding = HuffmanCoding("lib/sample.txt")
-        #output_path = huffman_coding.compress()
-        #huffman_coding.decompress(output_path)
 
 
 def parse_args():
@@ -74,5 +69,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
